@@ -4,8 +4,7 @@ Esta é uma API REST simples para gerenciar uma coleção de livros.
 
 ## Workflow de Desenvolvimento
 
-Este projeto utiliza o **GitHub Flow**. O motivo da escolha foi sua simplicidade e segurança, mantendo a branch `main` sempre estável.
-
+O workflow adotado foi o **GitHub Flow** por seu equilíbrio ideal entre agilidade e segurança para este projeto. Diferente de modelos mais complexos como o Git Flow, que seria um exagero para esta escala, o GitHub Flow é simples e direto. Ele se baseia em uma regra fundamental: a branch main está sempre estável e funcional. Todo o desenvolvimento de novas funcionalidades acontece em feature branches separadas, o que garante que o código principal nunca seja quebrado e organiza o histórico de forma clara, onde cada merge na main representa a adição de uma funcionalidade completa e testada.
 ## Como Executar
 
 1.  **Clone o repositório:**
