@@ -34,4 +34,4 @@ jobs:
 
       # 5. Executa os testes da aplicação
       - name: Executar os testes com pytest
-        run: pytest
+        run: python -m pytest
