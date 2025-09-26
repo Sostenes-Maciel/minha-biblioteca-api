@@ -1,0 +1,38 @@
+# .github/workflows/commit-workflow.yml
+
+name: Testes em Commits na Main
+
+# Gatilho: Este workflow roda sempre que um commit é enviado (push) para a branch 'main'
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # O trabalho vai rodar em uma máquina virtual Linux (Ubuntu)
+
+    steps:
+      # 1. Clona o repositório para a máquina virtual
+      # Ele já clona a branch correta (main) automaticamente.
+      - name: Clonar o repositório
+        uses: actions/checkout@v4
+
+      # 2. Instala o interpretador Python na versão 3.10
+      - name: Configurar Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # 3. Instala as dependências do projeto (Flask, Pytest, etc.)
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      # 4. (Opcional) Nota sobre compilação
+      # Como Python é uma linguagem interpretada, não há um passo de compilação.
+      # Se fosse Java ou C#, este seria o local para compilar o projeto.
+
+      # 5. Executa os testes da aplicação
+      - name: Executar os testes com pytest
+        run: pytest
