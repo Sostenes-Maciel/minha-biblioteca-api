@@ -1,0 +1,12 @@
+[Unit]
+Description=Minha Biblioteca API
+After=network.target
+
+[Service]
+User={{ app_user }}
+WorkingDirectory={{ app_home }}
+ExecStart={{ venv_path }}/bin/python {{ app_home }}/app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

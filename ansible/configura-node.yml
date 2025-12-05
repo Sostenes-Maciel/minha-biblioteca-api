@@ -1,0 +1,66 @@
+---
+- name: Deploy Minha Biblioteca API
+  hosts: biblioteca
+  become: true
+  vars:
+    app_user: biblioteca
+    app_home: /opt/minha-biblioteca-api
+    repo_url: https://github.com/Sostenes-Maciel/minha-biblioteca-api.git
+    python_bin: /usr/bin/python3
+    venv_path: "{{ app_home }}/venv"
+    service_name: minha-biblioteca
+
+  tasks:
+    - name: Instalar pacotes necessários
+      apt:
+        name:
+          - git
+          - python3
+          - python3-venv
+          - python3-pip
+        update_cache: yes
+        state: present
+
+    - name: Criar usuário da aplicação
+      user:
+        name: "{{ app_user }}"
+        system: yes
+
+    - name: Criar diretório da aplicação
+      file:
+        path: "{{ app_home }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+
+    - name: Clonar ou atualizar repositório
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_home }}"
+        version: main
+        force: yes
+
+    - name: Criar virtualenv
+      command: "{{ python_bin }} -m venv {{ venv_path }}"
+      args:
+        creates: "{{ venv_path }}/bin/activate"
+
+    - name: Instalar dependências
+      pip:
+        requirements: "{{ app_home }}/requirements.txt"
+        virtualenv: "{{ venv_path }}"
+
+    - name: Criar service systemd
+      template:
+        src: templates/minha-biblioteca.service.j2
+        dest: /etc/systemd/system/{{ service_name }}.service
+
+    - name: Reload no systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: Iniciar API
+      systemd:
+        name: "{{ service_name }}"
+        state: restarted
+        enabled: yes
