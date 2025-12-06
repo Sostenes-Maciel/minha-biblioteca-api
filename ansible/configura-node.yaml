@@ -1,0 +1,64 @@
+---
+- name: Configuração do Servidor para API Node.js
+  hosts: webservers # Deve bater com o nome no arquivo 'hosts'
+  become: yes       # Executa comandos como root (sudo)
+
+  tasks:
+    - name: Atualizar cache do apt
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Instalar dependências básicas (Git, Curl)
+      apt:
+        name:
+          - git
+          - curl
+          - build-essential
+        state: present
+
+    - name: Baixar script de instalação do Node.js (Versão 20 LTS)
+      get_url:
+        url: https://deb.nodesource.com/setup_20.x
+        dest: /tmp/nodesource_setup.sh
+        mode: '0755'
+
+    - name: Executar script de instalação do Node.js
+      command: /tmp/nodesource_setup.sh
+
+    - name: Instalar Node.js e NPM
+      apt:
+        name: nodejs
+        state: present
+
+    - name: Criar diretório da aplicação
+      file:
+        path: /var/www/minha-biblioteca-api
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Clonar o repositório do GitHub
+      git:
+        repo: 'https://github.com/Sostenes-Maciel/minha-biblioteca-api.git'
+        dest: /var/www/minha-biblioteca-api
+        version: main
+        force: yes # Garante que vai puxar as alterações mais recentes
+
+    - name: Instalar dependências do projeto (npm install)
+      npm:
+        path: /var/www/minha-biblioteca-api
+        production: yes # Instala apenas dependências de produção
+
+    - name: Instalar PM2 globalmente (Gerenciador de processos)
+      npm:
+        name: pm2
+        global: yes
+        state: present
+
+    - name: Iniciar a aplicação com PM2
+      command: pm2 start src/app.js --name "minha-biblioteca-api"
+      args:
+        chdir: /var/www/minha-biblioteca-api
+      ignore_errors: yes # Ignora erro se o processo já estiver rodando
